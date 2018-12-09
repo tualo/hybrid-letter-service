@@ -1,0 +1,35 @@
+{
+  "name": "hybrid-letter-server",
+  "version": "1.0.0",
+  "description": "hybrid letter server service",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tualo/hybrid-letter-service.git"
+  },
+  "keywords": [
+    "hybrid",
+    "letter"
+  ],
+  "author": "tualo solutions GmbH <thomas.hoffmann@tualo.de>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tualo/hybrid-letter-service/issues"
+  },
+  "homepage": "https://github.com/tualo/hybrid-letter-service#readme",
+  "dependencies": {
+    "express": "^4.16.4",
+    "mkdirp": "^0.5.1",
+    "pdfkit": "^0.8.3",
+    "tualo-commander": "^1.0.0"
+  },
+  "devDependencies": {
+    "glob": "^7.1.3",
+    "grunt": "^1.0.3",
+    "grunt-contrib-coffee": "^2.0.0",
+    "xml2js": "^0.4.19"
+  }
+}
