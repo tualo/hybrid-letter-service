@@ -30,7 +30,7 @@ Ext.define('HybridLetterServer.model.Portal', {
         ],
         proxy: {
             type: 'ajax',
-            url: '/hybrid/list',
+            url: '/hls/hybrid/list',
             reader: {
                 type: 'json',
                 rootProperty: 'data'
@@ -76,7 +76,7 @@ Ext.define('HybridLetterServer.model.Portal', {
         ],
         proxy: {
             type: 'ajax',
-            url: '/hybrid/preview',
+            url: '/hls/hybrid/preview',
             reader: {
                 type: 'json',
                 rootProperty: 'data'
@@ -97,7 +97,7 @@ Ext.define('HybridLetterServer.model.Portal', {
         ],
         proxy: {
             type: 'ajax',
-            url: '/hybrid/pdfpages',
+            url: '/hls/hybrid/pdfpages',
             reader: {
                 type: 'json',
                 rootProperty: 'data'

@@ -33,7 +33,7 @@ Ext.define('HybridLetterServer.controller.Portal', {
     },
     onPDFItemDplClick: function(view,record){
         console.log(record);
-        window.open('/preview/'+record.get('name'));
+        window.open('/hls/preview/'+record.get('name'));
     },
     printPDF: function(){
         var me =this,
@@ -42,7 +42,7 @@ Ext.define('HybridLetterServer.controller.Portal', {
             files = [];
         range.forEach( function(item){  files.push( item.get('name') ) } );
         Ext.Ajax.request({
-            url: '/hybrid/print',
+            url: '/hls/hybrid/print',
             params: {
                 files: JSON.stringify(files)
             },

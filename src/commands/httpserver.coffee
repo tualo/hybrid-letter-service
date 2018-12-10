@@ -58,14 +58,14 @@ class HttpServer extends Command
     app.use bodyParser.json()
     app.use bodyParser.urlencoded {extended: true}
     
-    app.use '/app', express.static( path.join('.','www','app') )
-    app.use '/preview', express.static( @tempdir )
+    app.use '/hls/app', express.static( path.join('.','www','app') )
+    app.use '/hls/preview', express.static( @tempdir )
 
-    app.get '/', (req, res) =>
+    app.get '/hls/', (req, res) =>
       result = {success: true}
       res.send(JSON.stringify(result))
 
-    app.get '/hybrid/list', (req, res) =>
+    app.get '/hls/hybrid/list', (req, res) =>
       result = {success: true}
       prms = @globJobFiles()
       .then (data) ->
@@ -76,7 +76,7 @@ class HttpServer extends Command
         result.msg = "Fehler beim Lesen der Aufträge"
         res.send JSON.stringify(result)
 
-    app.get '/hybrid/preview', (req, res) =>
+    app.get '/hls/hybrid/preview', (req, res) =>
       me = @
       result = {success: true}
       prms = me.globJobFiles()
@@ -95,7 +95,7 @@ class HttpServer extends Command
         res.send JSON.stringify(result)
 
     
-    app.post '/hybrid/print', (req, res) =>
+    app.post '/hls/hybrid/print', (req, res) =>
       me = @
       result = {success: true}
       files = JSON.parse( req.body.files);
@@ -132,7 +132,7 @@ class HttpServer extends Command
               res.send JSON.stringify(result)
         fn(index)
 
-    app.get '/hybrid/pdfpages', (req, res) =>
+    app.get '/hls/hybrid/pdfpages', (req, res) =>
       me = @
       result = {success: true}
       prms = me.globJobFiles()
