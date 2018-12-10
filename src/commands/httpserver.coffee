@@ -59,6 +59,8 @@ class HttpServer extends Command
     app.use bodyParser.urlencoded {extended: true}
     
     app.use '/hls/app', express.static( path.join('.','www','app') )
+    app.use '/app', express.static( path.join('.','www','app') )
+    
     app.use '/hls/preview', express.static( @tempdir )
 
     app.get '/hls/', (req, res) =>
