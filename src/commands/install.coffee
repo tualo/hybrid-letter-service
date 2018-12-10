@@ -24,7 +24,7 @@ class Install extends Command
     @timeout_timer = setTimeout @close.bind(@), @timeout
 
   action: (options,args) ->
-    if args.machine_ip
+    if args.jobpath
       servicefiledata="""
       [Unit]
       Description=Hybrid Letter Service
