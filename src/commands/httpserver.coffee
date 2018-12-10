@@ -249,7 +249,7 @@ class HttpServer extends Command
         baseitem.num = n++
         baseitem.id = baseitem.num
         baseitem.image = l
-        baseitem.preview = path.join('./preview',path.basename(l))
+        baseitem.preview = path.join('../preview',path.basename(l))
         baseitem.newletter = (p==0)
         baseitem.lastpage  = false
         baseitem.sequence=sequence
@@ -265,7 +265,7 @@ class HttpServer extends Command
           baseitem.num = n++
           baseitem.id = baseitem.num
           baseitem.image = path.join(me.tempdir,'blank.png')
-          baseitem.preview = path.join('./preview','blank.png')
+          baseitem.preview = path.join('../preview','blank.png')
           baseitem.newletter =(p==0)
           baseitem.lastpage  = false
           baseitem.sequence=sequence
@@ -283,7 +283,7 @@ class HttpServer extends Command
           baseitem.num = n++
           baseitem.id = baseitem.num
           baseitem.image = path.join(me.tempdir,'blank.png')
-          baseitem.preview = path.join('./preview','blank.png')
+          baseitem.preview = path.join('../preview','blank.png')
           baseitem.newletter =(p==0)
           baseitem.lastpage  = false
           baseitem.sequence=sequence
