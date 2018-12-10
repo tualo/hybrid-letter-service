@@ -22,7 +22,7 @@ colorprinter=''
 module.exports =
 class HttpServer extends Command
   @commandName: 'httpserver'
-  @commandArgs: ['port']
+  @commandArgs: ['port','jobpath']
   @commandShortDescription: 'running the bbs machine controll service'
   @options: []
 
@@ -37,6 +37,7 @@ class HttpServer extends Command
       @args = args
       @prnNumber = 10000
       @tempdir = path.join(os.tmpdir(),'hls')
+      #'/Users/thomashoffmann/Desktop/hybrid-test'
 
       mkdirp @tempdir,(err) ->
         if err
@@ -443,8 +444,9 @@ class HttpServer extends Command
 
   # BEGIN files store data
   globJobFiles: (cb) ->
+    me = @
     new Promise (resolve, reject) =>
-      pathname = '/Users/thomashoffmann/Desktop/hybrid-test'
+      pathname = me.args.jobpath
       console.log path.join(pathname,'*.xml')
       liste = glob.sync path.join(pathname,'*.xml')
       @loopxml [],liste,0,(res) ->
