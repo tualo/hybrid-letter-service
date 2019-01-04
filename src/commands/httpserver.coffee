@@ -198,7 +198,7 @@ class HttpServer extends Command
           item = liste[index]
           filename = path.basename(item.file).replace('.xml','.pdf')
           dirname = path.dirname(item.file)
-          device = 'png16m'
+          device = 'pngalpha'
           if item.color=='Schwarz/Weiß'
             device = 'pnggray'
           prms = me.printablePages dirname,filename, device
