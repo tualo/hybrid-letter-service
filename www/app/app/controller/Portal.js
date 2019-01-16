@@ -48,7 +48,7 @@ Ext.define('HybridLetterServer.controller.Portal', {
             },
             timeout: 30000,
             failure: function(){
-                console.log('print failure');
+                console.log('print failure',arguments);
                 var o = JSON.parse(res.responseText);
                 Ext.toast({
                     html: o.msg,
