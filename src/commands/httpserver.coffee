@@ -42,7 +42,7 @@ class HttpServer extends Command
       mkdirp @tempdir,(err) ->
         if err
           console.error err
-        fs.copyFileSync( path.resolve( path.join('.','images','blank.png') ), path.join(me.tempdir,'blank.png') )
+        fs.copyFileSync( path.resolve( path.join('.','images','blank.jpg') ), path.join(me.tempdir,'blank.jpg') )
       @openExpressServer()
 
       mkdirp path.resolve( path.join('.','config' ) ),(err) ->
@@ -198,9 +198,9 @@ class HttpServer extends Command
           item = liste[index]
           filename = path.basename(item.file).replace('.xml','.pdf')
           dirname = path.dirname(item.file)
-          device = 'pngalpha'
+          device = 'jpeg'
           if item.color=='Schwarz/Weiß'
-            device = 'pnggray'
+            device = 'jpeggray'
           prms = me.printablePages dirname,filename, device
           .then (data) ->
             running[index]=0
@@ -222,7 +222,7 @@ class HttpServer extends Command
       params.push '-dBATCH'
       params.push '-sDEVICE='+device
       params.push '-r600'
-      params.push '-sOutputFile='+path.join(me.tempdir,filename)+'%05d.png'
+      params.push '-sOutputFile='+path.join(me.tempdir,filename)+'%05d.jpg'
       params.push path.join(dirname,filename)
 
       prms = me.runcommand 'gs',params
@@ -242,7 +242,7 @@ class HttpServer extends Command
     for item in liste
       filename = path.basename(item.file,'.xml')
       dirname = path.dirname(item.file)
-      pngliste = glob.sync( path.join(me.tempdir,filename)+'*.png' )
+      pngliste = glob.sync( path.join(me.tempdir,filename)+'*.jpg' )
       p=0
       for l in pngliste
         baseitem = JSON.parse(JSON.stringify(item,null,1))
@@ -264,8 +264,8 @@ class HttpServer extends Command
           baseitem=JSON.parse(JSON.stringify(item,null,1))
           baseitem.num = n++
           baseitem.id = baseitem.num
-          baseitem.image = path.join(me.tempdir,'blank.png')
-          baseitem.preview = path.join('../preview','blank.png')
+          baseitem.image = path.join(me.tempdir,'blank.jpg')
+          baseitem.preview = path.join('../preview','blank.jpg')
           baseitem.newletter =(p==0)
           baseitem.lastpage  = false
           baseitem.sequence=sequence
@@ -282,8 +282,8 @@ class HttpServer extends Command
           baseitem=JSON.parse(JSON.stringify(list[list.length-1],null,1))
           baseitem.num = n++
           baseitem.id = baseitem.num
-          baseitem.image = path.join(me.tempdir,'blank.png')
-          baseitem.preview = path.join('../preview','blank.png')
+          baseitem.image = path.join(me.tempdir,'blank.jpg')
+          baseitem.preview = path.join('../preview','blank.jpg')
           baseitem.newletter =(p==0)
           baseitem.lastpage  = false
           baseitem.sequence=sequence
