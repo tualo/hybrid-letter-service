@@ -71,6 +71,8 @@ class HttpServer extends Command
     app.get '/hls/hybrid/list', (req, res) =>
       result = {success: true}
       console.log '/hls/hybrid/list'
+      me.filter = null
+      
       prms = @globJobFiles()
       .then (data) ->
         result.data=data
