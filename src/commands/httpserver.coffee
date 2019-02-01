@@ -160,6 +160,8 @@ class HttpServer extends Command
                 #me.archivFiles file
 
                 running[index]=0
+                console.log 'print','done*',running.reduce(me._sum, 0),index,data
+
                 if running.reduce(me._sum, 0)==0
                   console.log 'print','done',running.reduce(me._sum, 0),index,data
                   res.send JSON.stringify(result)
