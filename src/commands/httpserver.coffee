@@ -155,6 +155,7 @@ class HttpServer extends Command
                 result.success= true
                 result.msg = "Gedruckt"
                 result.data = data
+                console.log 'print',index,data
 
                 #me.archivFiles file
 
@@ -163,6 +164,7 @@ class HttpServer extends Command
                   res.send JSON.stringify(result)
 
               .catch (data) ->
+                console.log 'print',"Fehler beim Drucken ("+printerName+")",index,data
                 result.success= false
                 result.data = data
                 running[index]=0
@@ -170,6 +172,7 @@ class HttpServer extends Command
                 if running.reduce(me._sum, 0)==0
                   res.send JSON.stringify(result)
             fn(index)
+
           .catch (data) ->
             result.success = false
             result.msg = 'failed cupsenable'

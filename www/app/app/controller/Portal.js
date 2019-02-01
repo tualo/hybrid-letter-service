@@ -59,7 +59,7 @@ Ext.define('HybridLetterServer.controller.Portal', {
             params: {
                 files: JSON.stringify(files)
             },
-            timeout: 30000,
+            timeout: 300000,
             failure: function(){
                 console.log('print failure',arguments);
                 var o = JSON.parse(res.responseText);
