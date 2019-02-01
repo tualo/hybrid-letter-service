@@ -70,6 +70,7 @@ class HttpServer extends Command
 
     app.get '/hls/hybrid/list', (req, res) =>
       result = {success: true}
+      console.log '/hls/hybrid/list'
       prms = @globJobFiles()
       .then (data) ->
         result.data=data
@@ -550,6 +551,7 @@ class HttpServer extends Command
   # BEGIN files store data
   globJobFiles: (cb) ->
     me = @
+    console.log 'globJobFiles'
     new Promise (resolve, reject) =>
       pathname = me.args.jobpath
       liste = glob.sync path.join(pathname,'*.xml')
@@ -557,6 +559,7 @@ class HttpServer extends Command
         res.forEach (item) ->
           item.shortname = path.basename(item.file)
         
+        console.log 'globJobFiles', res,me.filter
         if me.filter!=null and (typeof me.filter!='undefined')
           res = res.filter (item) -> 
             item.shortname == me.filter
