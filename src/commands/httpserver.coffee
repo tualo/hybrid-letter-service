@@ -155,12 +155,13 @@ class HttpServer extends Command
                 result.success= true
                 result.msg = "Gedruckt"
                 result.data = data
-                console.log 'print',index,data
+                console.log 'print','done',running.reduce(me._sum, 0),index,data
 
                 #me.archivFiles file
 
                 running[index]=0
                 if running.reduce(me._sum, 0)==0
+                  console.log 'print','done',running.reduce(me._sum, 0),index,data
                   res.send JSON.stringify(result)
 
               .catch (data) ->
