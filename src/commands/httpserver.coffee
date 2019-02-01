@@ -381,13 +381,13 @@ class HttpServer extends Command
           sequence+=1
           
 
-        if sequence!=0
-          if list[sequence-1]
-            list[sequence-1].lastpage=true
+      if sequence!=0
+        if list[sequence-1]
+          list[sequence-1].lastpage=true
 
-            if list[sequence-1].pagenum%2==1
-              # frontseite zur letzten erklären
-              list[sequence-2].lastpage=true
+          if list[sequence-1].pagenum%2==1
+            # frontseite zur letzten erklären
+            list[sequence-2].lastpage=true
       
 
 
