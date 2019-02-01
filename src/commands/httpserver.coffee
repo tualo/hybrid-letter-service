@@ -157,7 +157,7 @@ class HttpServer extends Command
                 result.data = data
                 console.log 'print','done',running.reduce(me._sum, 0),index,data
 
-                #me.archivFiles file
+                me.archivFiles file
 
                 running[index-1]=0
                 console.log 'print','done*',running,running.reduce(me._sum, 0),index,data
