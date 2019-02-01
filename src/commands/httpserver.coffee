@@ -68,11 +68,7 @@ class HttpServer extends Command
       result = {success: true}
       res.send(JSON.stringify(result))
 
-    app.get '/hls/hybrid/killjob', (req, res) =>
-      me = @
-      result = {success: true}
-      res.send JSON.stringify(result)
-      me.killoldjobs()
+
 
 
     app.get '/hls/hybrid/list', (req, res) =>
@@ -131,69 +127,73 @@ class HttpServer extends Command
       result = {success: true}
       files = JSON.parse( req.body.files);
       running = Array(files.length).fill(1);
-
-      cancelcups = me.runcommand 'cancel',['-a']
+      kllj = me.killoldjobs()
       .then (data,opt) ->
+        cancelcups = me.runcommand 'cancel',['-a']
+        .then (data,opt) ->
 
-        for file,index in files
-          console.log 'print',file
-          printerName='vario'
-          if file.indexOf('color')>=0
-            printerName='color'
+          for file,index in files
+            console.log 'print',file
+            printerName='vario'
+            if file.indexOf('color')>=0
+              printerName='color'
 
-          cupsenable = me.runcommand 'cupsenable',[printerName]
-          .then (data,opt) ->
-            params = []
-            params.push '-J'+file
-            params.push '-o'
-            params.push 'sides=two-sided-long-edge'
-            params.push '-o'
-            params.push 'Duplex=DuplexNoTumble'
-            params.push '-P'
-            params.push printerName
-            params.push path.join(me.tempdir,file)
+            cupsenable = me.runcommand 'cupsenable',[printerName]
+            .then (data,opt) ->
+              params = []
+              params.push '-J'+file
+              params.push '-o'
+              params.push 'sides=two-sided-long-edge'
+              params.push '-o'
+              params.push 'Duplex=DuplexNoTumble'
+              params.push '-P'
+              params.push printerName
+              params.push path.join(me.tempdir,file)
 
-            console.log 'print',params
+              console.log 'print',params
 
-            #me.archivFiles file
-            fn = (index) ->
-              prms = me.runcommand 'lpr',params
-              .then (data,opt) ->
-                result.success= true
-                result.msg = "Gedruckt"
-                result.data = data
-                console.log 'print','done',running.reduce(me._sum, 0),index,data
-
-                me.archivFiles file
-
-                running[index-1]=0
-                console.log 'print','done*',running,running.reduce(me._sum, 0),index,data
-
-                if running.reduce(me._sum, 0)==0
+              #me.archivFiles file
+              fn = (index) ->
+                prms = me.runcommand 'lpr',params
+                .then (data,opt) ->
+                  result.success= true
+                  result.msg = "Gedruckt"
+                  result.data = data
                   console.log 'print','done',running.reduce(me._sum, 0),index,data
-                  res.send JSON.stringify(result)
 
-              .catch (data) ->
-                console.log 'print',"Fehler beim Drucken ("+printerName+")",index,data
-                result.success= false
-                result.data = data
-                running[index]=0
-                result.msg = "Fehler beim Drucken ("+printerName+")"
-                if running.reduce(me._sum, 0)==0
-                  res.send JSON.stringify(result)
-            fn(index)
+                  me.archivFiles file
 
-          .catch (data) ->
-            result.success = false
-            result.msg = 'failed cupsenable'
-            res.send JSON.stringify(result)
+                  running[index-1]=0
+                  console.log 'print','done*',running,running.reduce(me._sum, 0),index,data
+
+                  if running.reduce(me._sum, 0)==0
+                    console.log 'print','done',running.reduce(me._sum, 0),index,data
+                    res.send JSON.stringify(result)
+
+                .catch (data) ->
+                  console.log 'print',"Fehler beim Drucken ("+printerName+")",index,data
+                  result.success= false
+                  result.data = data
+                  running[index]=0
+                  result.msg = "Fehler beim Drucken ("+printerName+")"
+                  if running.reduce(me._sum, 0)==0
+                    res.send JSON.stringify(result)
+              fn(index)
+
+            .catch (data) ->
+              result.success = false
+              result.msg = 'failed cupsenable'
+              res.send JSON.stringify(result)
 
 
-      .catch (data) ->
-        result.success = false
-        result.msg = 'failed cancelcups'
-        res.send JSON.stringify(result)
+        .catch (data) ->
+          result.success = false
+          result.msg = 'failed cancelcups'
+          res.send JSON.stringify(result)
 
+      .catch (data)
+
+      
 
     app.get '/hls/hybrid/pdfpages', (req, res) =>
       me = @
@@ -220,16 +220,26 @@ class HttpServer extends Command
 
   killoldjobs: () ->
     me = @
-    lpstat = me.runcommand 'lpstat',[]
-    .then (data,opt) ->
-      console.log 'killoldjobs',data
-      datalist = data.split("\n")
-      datalist.forEach ( line ) ->
-        tabs =line.split(/\s/)
-        console.log tabs[0]
-      
-    .catch (data) ->
-      console.log 'killoldjobs*',data
+    new Promise (resolve, reject) ->
+
+      lpstat = me.runcommand 'lpstat',[]
+      .then (data,opt) ->
+        console.log 'killoldjobs',data
+        datalist = data.split("\n")
+        datalist.forEach ( line ) ->
+          tabs =line.split(/\s/)
+          console.log 
+          lpstat = me.runcommand 'cancel',[tabs[0]]
+          .then (data,opt) ->
+            console.log 'killed job',tabs[0]
+          .catch(daat) ->
+            console.log 'killed job',tabs[0],'failed'
+
+        resolve(true)
+
+      .catch (data) ->
+        console.log 'killoldjobs*',data
+        reject(true)
 
     #cancelcups = me.runcommand 'cancel',['-a']
     #.then (data,opt) ->
