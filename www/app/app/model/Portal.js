@@ -26,6 +26,7 @@ Ext.define('HybridLetterServer.model.Portal', {
             {name:'customer',type:"string"},
             {name:'group',type:"string"},
             {name:'file',type: 'string'},
+            {name:'shortname',type: 'string'},
             {name:'pages',type:"number"}
         ],
         proxy: {
@@ -41,7 +42,7 @@ Ext.define('HybridLetterServer.model.Portal', {
         }
         
       },
-
+      
       preview: {
         type: 'json',
         groupField: 'group',

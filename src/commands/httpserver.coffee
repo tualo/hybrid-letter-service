@@ -22,7 +22,7 @@ colorprinter=''
 module.exports =
 class HttpServer extends Command
   @commandName: 'httpserver'
-  @commandArgs: ['port','jobpath']
+  @commandArgs: ['port','jobpath','archivpath']
   @commandShortDescription: 'running the bbs machine controll service'
   @options: []
 
@@ -43,6 +43,7 @@ class HttpServer extends Command
         if err
           console.error err
         fs.copyFileSync( path.resolve( path.join('.','images','blank.jpg') ), path.join(me.tempdir,'blank.jpg') )
+        fs.copyFileSync( path.resolve( path.join('.','images','blank.pdf') ), path.join(me.tempdir,'blank.pdf') )
       @openExpressServer()
 
       mkdirp path.resolve( path.join('.','config' ) ),(err) ->
@@ -72,6 +73,7 @@ class HttpServer extends Command
       prms = @globJobFiles()
       .then (data) ->
         result.data=data
+
         res.send JSON.stringify(result)
       .catch (data) ->
         result.success= false
@@ -81,16 +83,32 @@ class HttpServer extends Command
     app.get '/hls/hybrid/preview', (req, res) =>
       me = @
       result = {success: true}
+      me.filter = null
+      if req.query
+        if req.query.file
+          me.filter = req.query.file
       prms = me.globJobFiles()
       .then (data) ->
-        prms2 = me.processJobFilesPNGPages(data)
+
+
+        promise3 = me.processJobFiles2SinglePages(data)
         .then (data) ->
-          result.data=me.processJobFilesPNGList data
+          result.data=me.processJobFilesImageList data
           res.send JSON.stringify(result)
         .catch (data) ->
           result.success= false
-          result.msg = "Fehler beim Vorbereiten der Aufträge"
+          result.msg = "Fehler beim Vorbereiten der Aufträge *"
           res.send JSON.stringify(result)
+
+        if false
+          prms2 = me.processJobFilesPNGPages(data)
+          .then (data) ->
+            result.data=me.processJobFilesPNGList data
+            res.send JSON.stringify(result)
+          .catch (data) ->
+            result.success= false
+            result.msg = "Fehler beim Vorbereiten der Aufträge"
+            res.send JSON.stringify(result)
       .catch (data) ->
         result.success= false
         result.msg = "Fehler beim Vorbereiten der Aufträge"
@@ -102,47 +120,68 @@ class HttpServer extends Command
       result = {success: true}
       files = JSON.parse( req.body.files);
       running = Array(files.length).fill(1);
-      for file,index in files
-        printerName='vario'
-        if file.indexOf('color')
-          printerName='color'
-        params = []
-        params.push '-J'+file
-        params.push '-o'
-        params.push 'sides=two-sided-long-edge'
-        params.push '-o'
-        params.push 'Duplex=DuplexNoTumble'
-        params.push '-P'
-        params.push printerName
-        params.push path.join(me.tempdir,file)
-        fn = (index) ->
-          prms = me.runcommand 'lpr',params
-          .then (data,opt) ->
-            result.success= true
-            result.msg = "Gedruckt"
-            result.data = data
-            running[index]=0
-            if running.reduce(me._sum, 0)==0
-              res.send JSON.stringify(result)
 
+      cancelcups = me.runcommand 'cancel',['-a']
+      .then (data,opt) ->
+
+        for file,index in files
+          printerName='vario'
+          if file.indexOf('color')
+            printerName='color'
+
+          cupsenable = me.runcommand 'cupsenable',[printerName]
+          .then (data,opt) ->
+            params = []
+            params.push '-J'+file
+            params.push '-o'
+            params.push 'sides=two-sided-long-edge'
+            params.push '-o'
+            params.push 'Duplex=DuplexNoTumble'
+            params.push '-P'
+            params.push printerName
+            params.push path.join(me.tempdir,file)
+            me.archivFiles file
+            fn = (index) ->
+              prms = me.runcommand 'lpr',params
+              .then (data,opt) ->
+                result.success= true
+                result.msg = "Gedruckt"
+                result.data = data
+
+                me.archivFiles file
+
+                running[index]=0
+                if running.reduce(me._sum, 0)==0
+                  res.send JSON.stringify(result)
+
+              .catch (data) ->
+                result.success= false
+                result.data = data
+                running[index]=0
+                result.msg = "Fehler beim Drucken ("+printerName+")"
+                if running.reduce(me._sum, 0)==0
+                  res.send JSON.stringify(result)
+            fn(index)
           .catch (data) ->
-            result.success= false
-            result.data = data
-            running[index]=0
-            result.msg = "Fehler beim Drucken ("+printerName+")"
-            if running.reduce(me._sum, 0)==0
-              res.send JSON.stringify(result)
-        fn(index)
+            result.success = false
+            result.msg = 'failed cupsenable'
+            res.send JSON.stringify(result)
+
+
+      .catch (data) ->
+        result.success = false
+        result.msg = 'failed cancelcups'
+        res.send JSON.stringify(result)
+
 
     app.get '/hls/hybrid/pdfpages', (req, res) =>
       me = @
       result = {success: true}
       prms = me.globJobFiles()
       .then (data) ->
-        data=me.processJobFilesPNGList data
+        data=me.processJobFilesImageList data
         prms2 = me.processCreatePDF(data)
         .then (data) ->
-          console.log data
           result.data=data
           res.send JSON.stringify(result)
         .catch (data) ->
@@ -187,9 +226,11 @@ class HttpServer extends Command
   _sum: (pv, cv) -> 
     pv+cv
 
-  # start converting parallel
-  # running keeps the state of all still running proceses
-  processJobFilesPNGPages: (liste) ->
+
+  # Job Liste der XML Daten durchlaufen
+  # Je Auftragsseite eine einzelne PDF erzeugen
+  
+  processJobFiles2SinglePages: (liste) ->
     me = @
     return new Promise (resolve, reject) ->
       running = Array(liste.length).fill(1);
@@ -198,10 +239,7 @@ class HttpServer extends Command
           item = liste[index]
           filename = path.basename(item.file).replace('.xml','.pdf')
           dirname = path.dirname(item.file)
-          device = 'jpeg'
-          if item.color=='Schwarz/Weiß'
-            device = 'jpeggray'
-          prms = me.printablePages dirname,filename, device
+          prms = me.printablePDFPages dirname,filename
           .then (data) ->
             running[index]=0
             if running.reduce(me._sum, 0)==0
@@ -213,27 +251,42 @@ class HttpServer extends Command
           
       listFN 0
 
-  printablePages: (dirname, filename, device) ->
+
+  printablePDFPages: (dirname, filename) ->
     me = @
     new Promise (resolve, reject) ->
       params = []
       params.push '-q'
       params.push '-dNOPAUSE'
       params.push '-dBATCH'
-      params.push '-sDEVICE='+device
+      params.push '-sDEVICE=pdfwrite'
       params.push '-r600'
-      params.push '-sOutputFile='+path.join(me.tempdir,filename)+'%05d.jpg'
+      params.push '-sOutputFile='+path.join(me.tempdir,filename)+'%05d.pdf'
       params.push path.join(dirname,filename)
 
       prms = me.runcommand 'gs',params
       .then (data) ->
-        console.log 'data',data
-        resolve data
+        
+
+        params2 = []
+        params2.push '-q'
+        params2.push '-dNOPAUSE'
+        params2.push '-dBATCH'
+        params2.push '-sDEVICE=jpeg'
+        params2.push '-r72'
+        params2.push '-sOutputFile='+path.join(me.tempdir,filename)+'%05d.jpg'
+        params2.push path.join(dirname,filename)
+
+        prms2 = me.runcommand 'gs',params2
+        .then (data2) ->
+          resolve data
+        .catch (data2) ->
+          reject data2
       .catch (data) ->
         reject data
 
 
-  processJobFilesPNGList: (liste) ->
+  processJobFilesImageList: (liste) ->
     me = @
     list = []
     n=0
@@ -242,13 +295,14 @@ class HttpServer extends Command
     for item in liste
       filename = path.basename(item.file,'.xml')
       dirname = path.dirname(item.file)
-      pngliste = glob.sync( path.join(me.tempdir,filename)+'*.jpg' )
+      imageliste = glob.sync( path.join(me.tempdir,filename)+'*.jpg' )
       p=0
-      for l in pngliste
+      for l in imageliste
         baseitem = JSON.parse(JSON.stringify(item,null,1))
         baseitem.num = n++
         baseitem.id = baseitem.num
         baseitem.image = l
+        baseitem.highrespdf = l.replace('.jpg','.pdf')
         baseitem.preview = path.join('../preview',path.basename(l))
         baseitem.newletter = (p==0)
         baseitem.lastpage  = false
@@ -264,8 +318,10 @@ class HttpServer extends Command
           baseitem=JSON.parse(JSON.stringify(item,null,1))
           baseitem.num = n++
           baseitem.id = baseitem.num
+
           baseitem.image = path.join(me.tempdir,'blank.jpg')
           baseitem.preview = path.join('../preview','blank.jpg')
+          baseitem.highrespdf = path.join(me.tempdir,'blank.pdf')
           baseitem.newletter =(p==0)
           baseitem.lastpage  = false
           baseitem.sequence=sequence
@@ -284,6 +340,7 @@ class HttpServer extends Command
           baseitem.id = baseitem.num
           baseitem.image = path.join(me.tempdir,'blank.jpg')
           baseitem.preview = path.join('../preview','blank.jpg')
+          baseitem.highrespdf = path.join(me.tempdir,'blank.pdf')
           baseitem.newletter =(p==0)
           baseitem.lastpage  = false
           baseitem.sequence=sequence
@@ -328,6 +385,10 @@ class HttpServer extends Command
     me.storeSequences()
     return list
 
+
+
+
+
   processCreatePDF: (range) ->
     me = @
     res =[]
@@ -357,101 +418,145 @@ class HttpServer extends Command
 
       sw = []
       cl = []
-
+      me.headerPages=0
       if sw_dlang.length>0
+        sw_dlang_txt.highrespdf = path.join(me.tempdir,'sw_dlang_txt'+'hdr.pdf')
+        sw_dlang_txt.omr='---'
+        me.headerPages++
+        me.createHDRPage sw_dlang_txt
         sw.push sw_dlang_txt
+        sw.push { omr: '---',highrespdf: path.join(me.tempdir,'blank.pdf') }
+
         sw= sw.concat sw_dlang
       if sw_c4.length>0
+        sw_c4_txt.highrespdf = path.join(me.tempdir,'sw_c4_txt'+'hdr.pdf')
+        sw_c4_txt.omr='---'
+        me.headerPages++
+        me.createHDRPage sw_c4_txt
         sw.push sw_c4_txt
+        sw.push { omr: '---',highrespdf: path.join(me.tempdir,'blank.pdf') }
+
         sw= sw.concat sw_c4
       if farbe_dlang.length>0
+        farbe_dlang_txt.highrespdf = path.join(me.tempdir,'farbe_dlang_txt'+'hdr.pdf')
+        farbe_dlang_txt.omr='---'
+        me.headerPages++
+        me.createHDRPage farbe_dlang_txt
         cl.push farbe_dlang_txt
+        cl.push { omr: '---',highrespdf: path.join(me.tempdir,'blank.pdf') }
+
         cl= cl.concat farbe_dlang
       if farbe_c4.length>0
+        farbe_c4_txt.highrespdf = path.join(me.tempdir,'farbe_c4_txt'+'hdr.pdf')
+        farbe_c4_txt.omr='---'
+        me.headerPages++
+        me.createHDRPage farbe_c4_txt
         cl.push farbe_c4_txt
+        cl.push { omr: '---',highrespdf: path.join(me.tempdir,'blank.pdf') }
+
         cl= cl.concat farbe_c4
         
-     
-      prms = me.createPRNDATA(sw,false)
-      .then (name) ->
-        if name!=null
-          res.push({name:name})
-        prms2 = me.createPRNDATA(cl,true)
+
+      #while me.headerPages>0
+      fn = () ->
+        prms = me.createOutPutPDF(sw,false)
         .then (name) ->
           if name!=null
             res.push({name:name})
-          resolve res
+          prms2 = me.createOutPutPDF(cl,true)
+          .then (name) ->
+            if name!=null
+              res.push({name:name})
+            resolve res
+          .catch (data) ->
+            reject data
         .catch (data) ->
-          reject false
-      .catch (data) ->
-        reject false
+          reject data
 
+      setTimeout fn,3000
 
-  createPRNDATA: (range,color) ->
+  createHDRPage: (record) ->
+    me = @
+    # deckblatt erzeugen
+    pdfopt = 
+      size: 'a4'
+      layout: 'portrait'
+      margin:0
+      compress: false
+      autoFirstPage: false
+    doc = new PDFDocument pdfopt
+    doc.pipe fs.createWriteStream( record.highrespdf )
+    doc.on 'end', () ->
+      me.headerPages--
+    pageopt = 
+      size: 'a4'
+      margin: 0
+    doc.addPage pageopt 
+    doc.fillColor('black').fontSize(25).text(record.env,100,100).text(record.col,100,150).text('Seiten: '+record.count,100,200).text('Blatt: '+(record.count/2),100,250)
+    doc.end()
+
+  createOutPutPDF: (range,color) ->
     me = @
     new Promise (resolve, reject) =>
+
+
       @prnNumber+=1
       name = 'job-hybrid-highres-bw-'+(@prnNumber)+'.pdf'
       if color
         name = 'job-hybrid-highres-color-'+(@prnNumber)+'.pdf'
-      pdfopt = 
-        size: 'a4'
-        layout: 'portrait'
-        margin:0
-        compress: false
-        autoFirstPage: false
+
+
       if range.length==0
         resolve null
       else
-        doc = new PDFDocument pdfopt
-        doc.pipe fs.createWriteStream( path.join(me.tempdir,name) )
-        doc.on 'end', () ->
-          console.log 'end', color
-          resolve name
+        filelist = []
+        params = []
+        params.push '-q'
+        params.push '-dNOPAUSE'
+        params.push '-dBATCH'
+        params.push '-sDEVICE=pdfwrite'
+        params.push '-sOutputFile='+path.join(me.tempdir,name)
+        params.push '-dPDFFitPage'
+        params.push '-dAutoRotatePages=/None'
 
-
-        pageopt = 
-          size: 'a4'
-          margin: 0
         for record in range
-          doc.addPage pageopt 
-          if typeof record.preview=='undefined'
-            doc.fillColor('black').fontSize(25).text(record.env,100,100).text(record.col,100,150).text('Seiten: '+record.count,100,200).text('Blatt: '+(record.count/2),100,250)
-            doc.addPage pageopt # empty second page
-          else
-            if record.image!=''
-              doc.image record.image,0,0, {fit: [@toPT(210),@toPT(297)] }
-          @setOMR record,doc
+          
+          if typeof record.omr!='undefined'
+            if record.omr!='---'
+              params.push '-f'
+              params.push path.resolve( path.join('.','images',record.omr+'.ps') )
+            else
+              params.push '-f'
+              params.push path.resolve( path.join('.','images','0000000.ps') )
+            params.push path.resolve( record.highrespdf )
+            filelist.push(record)
 
-        doc.end()
-    
-  toPT: (mm) ->
-    (mm/25.4)*72
+        prms = me.runcommand 'gs',params
+        .then (data) ->
+          fs.writeFileSync path.join(me.tempdir,name+'.json'),JSON.stringify(filelist,null,1)
+          resolve name
+        .catch (data) ->
+          reject data
 
-  setOMR: (record,doc) ->
-    ys=4.23
-    l = 6
-    x = 4
-    y_start = 297-250
-    if typeof record.omr!='undefined'
-      p = record.omr.split("")
-      for i in p
-        if i=="1"
-          doc.lineWidth( @toPT(0.4))
-          doc.moveTo( @toPT(x), @toPT(y_start) ).lineTo( @toPT(x+l), @toPT(y_start) ).stroke()
-        y_start+=ys
-
-
-
+  #cupsenable vario
+  #cancel -a
+  #lpstat -p vario -l
+  #cancel vario-46
 
   # BEGIN files store data
   globJobFiles: (cb) ->
     me = @
     new Promise (resolve, reject) =>
       pathname = me.args.jobpath
-      console.log path.join(pathname,'*.xml')
       liste = glob.sync path.join(pathname,'*.xml')
       @loopxml [],liste,0,(res) ->
+        res.forEach (item) ->
+          item.shortname = path.basename(item.file)
+        
+        if me.filter!=null and (typeof me.filter!='undefined')
+          res = res.filter (item) -> 
+            item.shortname == me.filter
+
         resolve res
 
   loopxml: (result,list,index,cb) ->
@@ -517,4 +622,26 @@ class HttpServer extends Command
       fs.writeFileSync(path.resolve( path.join('.','config','sequences.json') ),JSON.stringify(sequencesL,null,1))
     catch e
       console.error e
+
+  archivFiles: (file) ->
+    me = @
+    if fs.existsSync(path.join(me.tempdir,file+'.json'))
+      files = JSON.parse(fs.readFileSync(path.join(me.tempdir,file+'.json')))
+      console.log 'archivFiles',files
+      files.forEach (fileitem) ->
+        if typeof fileitem.shortname=='string'
+          
+          strdate = (new Date()).toISOString().substr(0,10);
+
+          mkdirp path.resolve( path.join( me.args.archivpath,strdate  ) ), (err) ->
+            if fs.existsSync(  path.join(me.args.jobpath,fileitem.shortname) )
+              fs.copyFileSync( path.resolve( path.join(me.args.jobpath,fileitem.shortname) ), path.join(me.args.archivpath,strdate,fileitem.shortname) )
+            if fs.existsSync(  path.join(me.args.jobpath,fileitem.shortname.replace('.xml','.pdf')) )
+              fs.copyFileSync( path.resolve( path.join(me.args.jobpath,fileitem.shortname.replace('.xml','.pdf')) ), path.join(me.args.archivpath,strdate,fileitem.shortname.replace('.xml','.pdf')) )
+            if fs.existsSync(  path.join(me.args.jobpath,fileitem.shortname) )
+              fs.unlinkSync( path.resolve( path.join(me.args.jobpath,fileitem.shortname) ) )
+            if fs.existsSync(  path.join(me.args.jobpath,fileitem.shortname.replace('.xml','.pdf')) )
+              fs.unlinkSync( path.resolve( path.join(me.args.jobpath,fileitem.shortname.replace('.xml','.pdf')) ) )
+          if fs.existsSync(path.join(me.tempdir,file+'.json'))
+            fs.unlinkSync( path.join(me.tempdir,file+'.json') )
 

@@ -22,7 +22,14 @@ Ext.define('HybridLetterServer.view.Portal', {
             //xtype: 'grid',
             tbar:[
                 {
-                    text: 'Vorverarbeiten',
+                    text: 'Vorverarbeiten (Auswahl)',
+                    handler: 'onStartCheckSelected',
+                    bind:{
+                        disabled: '{!canPrepare}'
+                    }
+                },
+                {
+                    text: 'Vorverarbeiten (Alle)',
                     handler: 'onStartCheck',
                     bind:{
                         disabled: '{!canPrepare}'

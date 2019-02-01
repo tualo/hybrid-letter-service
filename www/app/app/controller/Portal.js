@@ -25,6 +25,19 @@ Ext.define('HybridLetterServer.controller.Portal', {
             model = me.getViewModel();
         model.getStore('preview').load();
     },
+    onStartCheckSelected: function(){
+        var me =this,
+            model = me.getViewModel(),
+            grid = this.lookupReference('printerpanel'),
+            records = grid.getSelectionModel().getSelection();
+        if (!Ext.isEmpty(records)){
+            model.getStore('preview').load({
+                params: {
+                    file: records[0].get('shortname')
+                }
+            });
+        }
+    },
     onPreviewLoad: function(store,records){
         var me =this,
             model = me.getViewModel();
