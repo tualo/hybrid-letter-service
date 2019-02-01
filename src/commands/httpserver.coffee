@@ -68,6 +68,13 @@ class HttpServer extends Command
       result = {success: true}
       res.send(JSON.stringify(result))
 
+    app.get '/hls/hybrid/killjob', (req, res) =>
+      me = @
+      result = {success: true}
+      res.send JSON.stringify(result)
+      me.killoldjobs()
+
+
     app.get '/hls/hybrid/list', (req, res) =>
       me = @
       result = {success: true}
@@ -211,7 +218,17 @@ class HttpServer extends Command
 
 
 
+  killoldjobs: () ->
+    lpstat = me.runcommand 'lpstat',['-a']
+    .then (data,opt) ->
+      console.log 'killoldjobs',data
+    .catch (data) ->
+      console.log 'killoldjobs*',data
 
+    #cancelcups = me.runcommand 'cancel',['-a']
+    #.then (data,opt) ->
+
+  
   runcommand: (cmd,param,opt) ->
     new Promise (resolve, reject) ->
       try
