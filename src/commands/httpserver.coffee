@@ -191,7 +191,7 @@ class HttpServer extends Command
           result.msg = 'failed cancelcups'
           res.send JSON.stringify(result)
 
-      .catch (data)
+      .catch (data) ->
         console.log 'killall failed'
         res.send JSON.stringify(result)
 
