@@ -69,10 +69,11 @@ class HttpServer extends Command
       res.send(JSON.stringify(result))
 
     app.get '/hls/hybrid/list', (req, res) =>
+      me = @
       result = {success: true}
       console.log '/hls/hybrid/list'
       me.filter = null
-      
+
       prms = @globJobFiles()
       .then (data) ->
         result.data=data
