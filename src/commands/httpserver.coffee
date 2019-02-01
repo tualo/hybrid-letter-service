@@ -223,6 +223,11 @@ class HttpServer extends Command
     lpstat = me.runcommand 'lpstat',[]
     .then (data,opt) ->
       console.log 'killoldjobs',data
+      datalist = data.split("\n")
+      datalist.forEach ( line ) ->
+        tabs =line.split(/\s/)
+        console.log tab[0]
+      
     .catch (data) ->
       console.log 'killoldjobs*',data
 
