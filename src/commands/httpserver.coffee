@@ -219,6 +219,7 @@ class HttpServer extends Command
 
 
   killoldjobs: () ->
+    me = @
     lpstat = me.runcommand 'lpstat',['-a']
     .then (data,opt) ->
       console.log 'killoldjobs',data
