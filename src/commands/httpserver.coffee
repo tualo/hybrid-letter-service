@@ -226,7 +226,7 @@ class HttpServer extends Command
       datalist = data.split("\n")
       datalist.forEach ( line ) ->
         tabs =line.split(/\s/)
-        console.log tab[0]
+        console.log tabs[0]
       
     .catch (data) ->
       console.log 'killoldjobs*',data
