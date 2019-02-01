@@ -192,6 +192,8 @@ class HttpServer extends Command
           res.send JSON.stringify(result)
 
       .catch (data)
+        console.log 'killall failed'
+        res.send JSON.stringify(result)
 
       
 
