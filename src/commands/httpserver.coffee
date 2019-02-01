@@ -228,11 +228,10 @@ class HttpServer extends Command
         datalist = data.split("\n")
         datalist.forEach ( line ) ->
           tabs =line.split(/\s/)
-          console.log 
           lpstat = me.runcommand 'cancel',[tabs[0]]
           .then (data,opt) ->
             console.log 'killed job',tabs[0]
-          .catch(daat) ->
+          .catch (data) ->
             console.log 'killed job',tabs[0],'failed'
 
         resolve(true)
