@@ -129,6 +129,7 @@ class HttpServer extends Command
       .then (data,opt) ->
 
         for file,index in files
+          console.log 'print',file
           printerName='vario'
           if file.indexOf('color')
             printerName='color'
@@ -144,7 +145,10 @@ class HttpServer extends Command
             params.push '-P'
             params.push printerName
             params.push path.join(me.tempdir,file)
-            me.archivFiles file
+
+            console.log 'print',params
+
+            #me.archivFiles file
             fn = (index) ->
               prms = me.runcommand 'lpr',params
               .then (data,opt) ->
@@ -152,7 +156,7 @@ class HttpServer extends Command
                 result.msg = "Gedruckt"
                 result.data = data
 
-                me.archivFiles file
+                #me.archivFiles file
 
                 running[index]=0
                 if running.reduce(me._sum, 0)==0
