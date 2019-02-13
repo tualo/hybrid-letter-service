@@ -1,8 +1,23 @@
 %!
+          /pagewidtho  currentpagedevice /PageSize get 0 get def
+          /pageheighto currentpagedevice /PageSize get 1 get def
+    (---) print
+    (---) print
+    pageheighto (     ) cvs print
+    (x) print
+    pagewidtho (     ) cvs print
+    (---***) print
 <<
-    /PageSize [595 842]
     /EndPage {
         exch pop 2 lt {
+          /pagewidth  currentpagedevice /PageSize get 0 get def
+          /pageheight currentpagedevice /PageSize get 1 get def
+    (---) print
+    pageheight (     ) cvs print
+    (x) print
+    pagewidth (     ) cvs print
+    (---) print
+          pageheight pagewidth gt {
             gsave
              newpath
              11.338582677165354 708.6614173228347 moveto
@@ -31,6 +46,36 @@
              stroke
             grestore
             true
+          } {
+            gsave
+             newpath
+             708.6614173228347 566.9291338582677 moveto
+             708.6614173228347 549.9212598425197 lineto
+             1.1338582677165356 setlinewidth
+             stroke
+             newpath
+             696.6708661417323 566.9291338582677 moveto
+             696.6708661417323 549.9212598425197 lineto
+             1.1338582677165356 setlinewidth
+             stroke
+             newpath
+             672.6897637795275 566.9291338582677 moveto
+             672.6897637795275 549.9212598425197 lineto
+             1.1338582677165356 setlinewidth
+             stroke
+             newpath
+             648.7086614173228 566.9291338582677 moveto
+             648.7086614173228 549.9212598425197 lineto
+             1.1338582677165356 setlinewidth
+             stroke
+             newpath
+             636.7181102362204 566.9291338582677 moveto
+             636.7181102362204 549.9212598425197 lineto
+             1.1338582677165356 setlinewidth
+             stroke
+            grestore
+            true
+          } ifelse
         } { false } ifelse
     }bind
 >>setpagedevice

@@ -310,6 +310,17 @@ class HttpServer extends Command
       params.push '-sDEVICE=pdfwrite'
       params.push '-r600'
       params.push '-sOutputFile='+path.join(me.tempdir,filename)+'%05d.pdf'
+      params.push '-dPDFFitPage'
+      params.push '-dFIXEDMEDIA'
+      params.push '-sPAPERSIZE=a4'
+      params.push '-dAutoRotatePages=/None'
+
+      #gs -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -dFIXEDMEDIA -dPDFFitPage -sPAPERSIZE=a4 -dAone
+
+      # -dNODISPLAY -q -sFile=IN.PDF -dDumpMediaSizes pdf_info.ps >DUMP.TXT
+      #-dAutoRotatePages=/PageByPage
+      #-dAutoRotatePages=/None
+      #params.push '-dAutoRotatePages=/PageByPage'
       params.push path.join(dirname,filename)
 
       prms = me.runcommand 'gs',params
@@ -333,6 +344,8 @@ class HttpServer extends Command
       .catch (data) ->
         reject data
 
+  #-dNODISPLAY -q -sFileName=abc.pdf -c "FileName (r) file runpdfbegin 1 1 pdfpagecount {pdfgetpage /MediaBox get {=print ( ) print} forall (\n) print} for quit"
+  #rotateOut
 
   processJobFilesImageList: (liste) ->
     me = @
@@ -567,9 +580,14 @@ class HttpServer extends Command
         params.push '-dNOPAUSE'
         params.push '-dBATCH'
         params.push '-sDEVICE=pdfwrite'
+
         params.push '-sOutputFile='+path.join(me.tempdir,name)
         params.push '-dPDFFitPage'
-        params.push '-dAutoRotatePages=/None'
+
+        # -dNODISPLAY -q -sFile=IN.PDF -dDumpMediaSizes pdf_info.ps >DUMP.TXT
+        #-dAutoRotatePages=/PageByPage
+        #-dAutoRotatePages=/None
+        #params.push '-dAutoRotatePages=/PageByPage'
 
         for record in range
           
@@ -577,11 +595,19 @@ class HttpServer extends Command
             if record.omr!='---'
               params.push '-f'
               params.push path.resolve( path.join('.','images',record.omr+'.ps') )
+
+
             else
+              
               params.push '-f'
               params.push path.resolve( path.join('.','images','0000000.ps') )
+              
+            params.push '-f'
             params.push path.resolve( record.highrespdf )
+
             filelist.push(record)
+
+        console.log "\n\n\n\n"+params.join(" \\\n")+"\n\n\n\n"
 
         prms = me.runcommand 'gs',params
         .then (data) ->
