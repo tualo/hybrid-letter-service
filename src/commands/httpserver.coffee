@@ -293,6 +293,8 @@ class HttpServer extends Command
             if running.reduce(me._sum, 0)==0
               resolve liste
           .catch (data) ->
+            console.err "processJobFiles2SinglePages", filename
+            console.err "processJobFiles2SinglePages", data
             reject data
           listFN index+1
         else
