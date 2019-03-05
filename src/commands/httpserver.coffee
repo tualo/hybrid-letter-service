@@ -632,6 +632,7 @@ class HttpServer extends Command
       liste = glob.sync path.join(pathname,'*.xml')
       console.log 'globJobFiles',liste,me.filter
       @loopxml [],liste,0,(res) ->
+        console.log 'globJobFiles','loopxml'
         res.forEach (item) ->
           item.shortname = path.basename(item.file)
         
