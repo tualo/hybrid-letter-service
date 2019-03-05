@@ -645,8 +645,9 @@ class HttpServer extends Command
 
   loopxml: (result,list,index,cb) ->
     if index<list.length
+      console.log 'loopxml',index,data.toString().substr(0,10)+'..',list[index],list.length
       data = fs.readFileSync(list[index])
-      console.log 'loopxml',index,data.toString().substr(0,10)+'..'
+      console.log 'loopxml',index,data.toString().substr(0,10)+'..',list[index],list.length
       parseString data, (err, res) =>
         o = 
           fname: list[index],
