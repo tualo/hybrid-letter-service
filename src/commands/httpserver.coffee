@@ -422,7 +422,7 @@ class HttpServer extends Command
         baseitem.pagenum=p
         list.push(baseitem)
         p+=1
-        sequence+=1
+        #sequence+=1
 
     sequenceNum=0
 
@@ -432,10 +432,10 @@ class HttpServer extends Command
         me.sequencesStore[item.color+'|'+item.envelope]=0
       sequenceNum=me.sequencesStore[item.color+'|'+item.envelope]
 
-      if item.pagenum%2==0
+      if item.pagenum%2 == 0
         seq = sequenceNum.toString(2).substr(-3)#;//.split("").reverse().join("")
         sequenceNum+=1
-        while seq.length<3
+        while seq.length < 3
           seq='0'+seq
         seq = '1'+'x'+seq+'p1'
         if item.lastpage
@@ -448,6 +448,7 @@ class HttpServer extends Command
         else
           seq = seq.replace('p','0')
         item.omr=seq
+        console.log item.highrespdf, sequenceNum, seq
       me.sequencesStore[item.color+'|'+item.envelope]=sequenceNum
 
     me.storeSequences()
