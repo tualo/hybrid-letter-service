@@ -626,17 +626,13 @@ class HttpServer extends Command
   # BEGIN files store data
   globJobFiles: (cb) ->
     me = @
-    console.log 'globJobFiles'
     new Promise (resolve, reject) =>
       pathname = me.args.jobpath
       liste = glob.sync path.join(pathname,'*.xml')
-      console.log 'globJobFiles',liste,me.filter
       @loopxml [],liste,0,(res) ->
-        console.log 'globJobFiles','loopxml'
         res.forEach (item) ->
           item.shortname = path.basename(item.file)
         
-        console.log 'globJobFiles', res,me.filter
         if me.filter!=null and (typeof me.filter!='undefined')
           res = res.filter (item) -> 
             item.shortname == me.filter
@@ -644,10 +640,8 @@ class HttpServer extends Command
         resolve res
 
   loopxml: (result,list,index,cb) ->
-    if index<list.length
-      console.log 'loopxml',index,list[index],list.length
+    if index < list.length
       data = fs.readFileSync(list[index])
-      console.log 'loopxml',index,data.toString().substr(0,10)+'..',list[index],list.length
       parseString data, (err, res) =>
         o = 
           fname: list[index],
@@ -657,12 +651,10 @@ class HttpServer extends Command
         index+=1
         @loopxml result,list,index,cb
     else
-      console.log 'loopxml','end'
       @xml2store result, cb
   
   xml2store: (liste,cb) ->
     result = []
-    console.log 'xml2store',liste
     liste.forEach (item) ->
       try
         id = item.result.JobTicket.Job_ID[0]
@@ -686,7 +678,6 @@ class HttpServer extends Command
         result.push o
       catch e
         console.log e
-    console.log 'xml2store','end'
     cb result
   # END files store data
 
