@@ -100,6 +100,7 @@ Ext.define('HybridLetterServer.model.Portal', {
         ],
         proxy: {
             type: 'ajax',
+            timeout: 300000,
             url: '/hls/hybrid/pdfpages',
             reader: {
                 type: 'json',
