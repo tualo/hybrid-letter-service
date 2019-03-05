@@ -434,6 +434,7 @@ class HttpServer extends Command
 
       if item.pagenum%2 == 0
         seq = Number(sequenceNum).toString(2).substr(-3)#;//.split("").reverse().join("")
+        console.log item.highrespdf, sequenceNum, seq
         sequenceNum+=1
         while seq.length < 3
           seq='0'+seq
@@ -448,7 +449,7 @@ class HttpServer extends Command
         else
           seq = seq.replace('p','0')
         item.omr=seq
-        console.log item.highrespdf, sequenceNum, seq
+        
       me.sequencesStore[item.color+'|'+item.envelope]=sequenceNum
 
     me.storeSequences()
