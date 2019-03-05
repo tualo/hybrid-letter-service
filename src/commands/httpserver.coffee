@@ -630,6 +630,7 @@ class HttpServer extends Command
     new Promise (resolve, reject) =>
       pathname = me.args.jobpath
       liste = glob.sync path.join(pathname,'*.xml')
+      console.log 'globJobFiles',liste,me.filter
       @loopxml [],liste,0,(res) ->
         res.forEach (item) ->
           item.shortname = path.basename(item.file)
