@@ -645,7 +645,7 @@ class HttpServer extends Command
 
   loopxml: (result,list,index,cb) ->
     if index<list.length
-      console.log 'loopxml',index,data.toString().substr(0,10)+'..',list[index],list.length
+      console.log 'loopxml',index,list[index],list.length
       data = fs.readFileSync(list[index])
       console.log 'loopxml',index,data.toString().substr(0,10)+'..',list[index],list.length
       parseString data, (err, res) =>
@@ -657,6 +657,7 @@ class HttpServer extends Command
         index+=1
         @loopxml result,list,index,cb
     else
+      console.log 'loopxml','end'
       @xml2store result, cb
   
   xml2store: (liste,cb) ->
