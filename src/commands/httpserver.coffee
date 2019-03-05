@@ -662,27 +662,31 @@ class HttpServer extends Command
   
   xml2store: (liste,cb) ->
     result = []
+    console.log 'xml2store',liste
     liste.forEach (item) ->
+      try
+        id = item.result.JobTicket.Job_ID[0]
+        customer = item.result.JobTicket.Customer[0]
+        pagecnt = item.result.JobTicket.Page_cnt[0]
 
-      id = item.result.JobTicket.Job_ID[0]
-      customer = item.result.JobTicket.Customer[0]
-      pagecnt = item.result.JobTicket.Page_cnt[0]
+        color = item.result.JobTicket.TicDP[0]['TicDruckmodus'][0]['value'][0]
+        envelope = item.result.JobTicket.TicDP[0]['TicKuvertgrösse'][0]['value'][0]
+        layout = item.result.JobTicket.TicDP[0]['TicLayout'][0]['value'][0]
 
-      color = item.result.JobTicket.TicDP[0]['TicDruckmodus'][0]['value'][0]
-      envelope = item.result.JobTicket.TicDP[0]['TicKuvertgrösse'][0]['value'][0]
-      layout = item.result.JobTicket.TicDP[0]['TicLayout'][0]['value'][0]
-
-      o =
-        id: id
-        group: envelope+' / '+color
-        customer: customer
-        file: item.fname
-        pages: pagecnt
-        color: color
-        envelope: envelope
-        layout: layout
-        processed: false
-      result.push o
+        o =
+          id: id
+          group: envelope+' / '+color
+          customer: customer
+          file: item.fname
+          pages: pagecnt
+          color: color
+          envelope: envelope
+          layout: layout
+          processed: false
+        result.push o
+      catch e
+        console.log e
+    console.log 'xml2store','end'
     cb result
   # END files store data
 
