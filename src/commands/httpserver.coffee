@@ -135,6 +135,7 @@ class HttpServer extends Command
           for file,index in files
             console.log 'print',file
             printerName='vario'
+            printerName='color'
             if file.indexOf('color')>=0
               printerName='color'
 
