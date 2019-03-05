@@ -31,6 +31,7 @@ Ext.define('HybridLetterServer.model.Portal', {
         ],
         proxy: {
             type: 'ajax',
+            timeout: 300000,
             url: '/hls/hybrid/list',
             reader: {
                 type: 'json',
@@ -77,6 +78,7 @@ Ext.define('HybridLetterServer.model.Portal', {
         ],
         proxy: {
             type: 'ajax',
+            timeout: 300000,
             url: '/hls/hybrid/preview',
             reader: {
                 type: 'json',
