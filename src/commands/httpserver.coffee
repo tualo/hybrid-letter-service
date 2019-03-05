@@ -449,7 +449,7 @@ class HttpServer extends Command
         else
           seq = seq.replace('p','0')
         item.omr=seq
-        
+        onsole.log item.highrespdf,'>>>>>', seq
       me.sequencesStore[item.color+'|'+item.envelope]=sequenceNum
 
     me.storeSequences()
