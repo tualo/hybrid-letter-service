@@ -432,6 +432,7 @@ class HttpServer extends Command
       #params.push '-dAutoRotatePages=/PageByPage'
       params.push path.join(dirname,filename)
 
+      console.log  'gs ',params.join(' '),path.join(dirname,filename)
       prms = me.runcommand 'gs',params
       .then (data) ->
         
