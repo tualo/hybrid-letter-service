@@ -359,7 +359,7 @@ class HttpServer extends Command
         console.log "precheckfonts_loop", "running", running
         if index < liste.length
           item = liste[index]
-          filename = path.basename(item.file).replace('.xml','.pdf')
+          filename = item.file.replace('.xml','.pdf')
           prms = me.precheckfonts filename
           .then (data) ->
             running[index]=0
