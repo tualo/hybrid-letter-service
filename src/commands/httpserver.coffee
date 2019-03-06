@@ -351,23 +351,19 @@ class HttpServer extends Command
   precheckfonts_loop: (liste)->
     me = @
     resul_liste = []
-    console.log "precheckfonts_loop",liste.length
     return new Promise (resolve, reject) ->
       running = Array(liste.length).fill(1);
-      console.log "precheckfonts_loop"
       listFN = (index) ->
-        console.log "precheckfonts_loop", "running", running
         if index < liste.length
           item = liste[index]
           filename = item.file.replace('.xml','.pdf')
           prms = me.precheckfonts filename
           .then (data) ->
+            liste.fontcheck = data
             running[index]=0
-            console.log "precheckfonts_loop", "then", running
             if running.reduce(me._sum, 0)==0
               resolve liste
           .catch (data) ->
-            console.log "precheckfonts_loop", filename
             reject data
           listFN index+1
         else
@@ -382,10 +378,25 @@ class HttpServer extends Command
       params.push path.join(filename)
       prms = me.runcommand 'pdffonts',params
       .then (data) ->
+        result = 
+          success: true
+          msg: ''
+          filename: filename
+          fonts: []
         fonts_tab = data.split(/\n/)
+        hasError = false
         fonts_tab.forEach (line) ->
-          console.log('#',line,line.replace(/\s\s+/g,' ').split(/\s/))
-        resolve(data)
+          columns = line.replace(/\s\s+/g,' ').split(/\s/)
+          if columns.length > 0
+            if columns[0] != 'name'
+              if columns[0].indexOf('--') != 0
+                # 'name', 'type', 'encoding', 'emb', 'sub', 'uni', 'object', 'ID'
+                result.fonts.push {name: columns[0],type: columns[1], encoding: columns[2], emb: columns[3], sub: columns[4], uni: columns[5], object: columns[6], id: columns[7]}
+                if columns[3]=='no' and columns[4]=='no'
+                  result.success = false
+                  result.message = 'Die Schriftart '+columns[0]+' kann nicht richtig verarbeitet werden'
+          #console.log('#',line,line.replace(/\s\s+/g,' ').split(/\s/))
+        resolve(result)
       .catch (data) ->
         console.log('# error',data)
         reject data
