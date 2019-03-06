@@ -81,20 +81,27 @@ class HttpServer extends Command
       .then (data) ->
         result.data=data
         console.log '/hls/hybrid/list',data.length
+        if data.length > 1
+          prms_font = me.precheckfonts_loop(data)
+          .then (result_liste) ->
+            console.log '/hls/hybrid/list'
+            result.data=result_liste
+            res.send JSON.stringify(result)
+          .catch (data) ->
+            result.success=false
+            result.data_fonts=data
+            res.send JSON.stringify(result)
+        else
+          result.success=true
+          result.data = []
+          result.msg="keine Daten"
+          res.send JSON.stringify(result)
 
-        prms_font = me.precheckfonts_loop(data)
-        .then (result_liste) ->
-          console.log '/hls/hybrid/list'
-          result.data=result_liste
-          res.send JSON.stringify(result)
-        .catch (data) ->
-          result.success=false
-          result.data_fonts=data
-          res.send JSON.stringify(result)
       .catch (data) ->
         result.success= false
         result.msg = "Fehler beim Lesen der Aufträge"
         res.send JSON.stringify(result)
+      
 
     app.get '/hls/hybrid/preview', (req, res) =>
       me = @
