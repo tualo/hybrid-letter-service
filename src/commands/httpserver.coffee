@@ -362,7 +362,7 @@ class HttpServer extends Command
             liste[index].fontcheck = data
             running[index]=0
             if running.reduce(me._sum, 0)==0
-              resolve result_liste
+              resolve liste
           .catch (data) ->
             reject data
           listFN index+1
