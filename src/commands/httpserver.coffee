@@ -81,7 +81,7 @@ class HttpServer extends Command
       .then (data) ->
         result.data=data
         console.log '/hls/hybrid/list',data.length
-        if data.length > 1
+        if data.length > 0
           prms_font = me.precheckfonts_loop(data)
           .then (result_liste) ->
             console.log '/hls/hybrid/list'
