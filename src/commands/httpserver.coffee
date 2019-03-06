@@ -80,8 +80,10 @@ class HttpServer extends Command
       prms = @globJobFiles()
       .then (data) ->
         result.data=data
+        console.log '/hls/hybrid/list',data.length
         prms_font = me.precheckfonts_loop()
         .then (data) ->
+          console.log '/hls/hybrid/list'
           result.data_fonts=data
           res.send JSON.stringify(result)
         .catch (data) ->
@@ -348,6 +350,7 @@ class HttpServer extends Command
   precheckfonts_loop: (liste)->
     me = @
     resul_liste = []
+    console.log "precheckfonts_loop",liste.length
     return new Promise (resolve, reject) ->
       running = Array(liste.length).fill(1);
       console.log "precheckfonts_loop"
