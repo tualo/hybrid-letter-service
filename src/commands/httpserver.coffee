@@ -589,13 +589,13 @@ class HttpServer extends Command
         if record.color=='Schwarz/Weiß' and ( record.envelope=='DIN C6 (22,9cm x 11,4cm)' or record.envelope=='DIN C6/5 (22,9cm x 11,4cm)')
           sw_dlang.push record
           sw_dlang_txt.count+=1
-        if record.color=='Schwarz/Weiß' and ( record.envelope!='DIN C6 (22,9cm x 11,4cm)' or record.envelope=='DIN C6/5 (22,9cm x 11,4cm)')
+        if record.color=='Schwarz/Weiß' and ( record.envelope!='DIN C6 (22,9cm x 11,4cm)' and record.envelope!='DIN C6/5 (22,9cm x 11,4cm)')
           sw_c4.push record
           sw_c4_txt.count+=1
         if record.color!='Schwarz/Weiß' and ( record.envelope=='DIN C6 (22,9cm x 11,4cm)' or record.envelope=='DIN C6/5 (22,9cm x 11,4cm)')
           farbe_dlang.push record
           farbe_dlang_txt.count+=1
-        if record.color!='Schwarz/Weiß' and ( record.envelope!='DIN C6 (22,9cm x 11,4cm)' or record.envelope=='DIN C6/5 (22,9cm x 11,4cm)')
+        if record.color!='Schwarz/Weiß' and ( record.envelope!='DIN C6 (22,9cm x 11,4cm)' and record.envelope!='DIN C6/5 (22,9cm x 11,4cm)')
           farbe_c4.push record
           farbe_c4_txt.count+=1
 
