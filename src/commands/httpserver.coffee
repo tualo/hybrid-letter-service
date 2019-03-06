@@ -391,11 +391,14 @@ class HttpServer extends Command
           prms = me.precheckfonts filename
           .then (data) ->
             liste[index].fontcheck = data
-            running[index]=0
             result_liste.push liste[index]
+            running[index]=0
             if running.reduce(me._sum, 0)==0
               resolve liste
           .catch (data) ->
+            running[index]=0
+            if running.reduce(me._sum, 0)==0
+              resolve liste
             #reject data
           listFN index+1
         else
