@@ -392,10 +392,11 @@ class HttpServer extends Command
           .then (data) ->
             liste[index].fontcheck = data
             running[index]=0
+            result_liste.push liste[index]
             if running.reduce(me._sum, 0)==0
               resolve liste
           .catch (data) ->
-            reject data
+            #reject data
           listFN index+1
         else
       listFN 0
@@ -424,8 +425,9 @@ class HttpServer extends Command
                 # 'name', 'type', 'encoding', 'emb', 'sub', 'uni', 'object', 'ID'
                 result.fonts.push {name: columns[0],type: columns[1], encoding: columns[2], emb: columns[3], sub: columns[4], uni: columns[5], object: columns[6], id: columns[7]}
                 if columns[3]=='no' and columns[4]=='no'
-                  result.success = false
-                  result.message = 'Die Schriftart '+columns[0]+' kann nicht richtig verarbeitet werden'
+                  reject result
+                  #result.success = false
+                  #result.message = 'Die Schriftart '+columns[0]+' kann nicht richtig verarbeitet werden'
           #console.log('#',line,line.replace(/\s\s+/g,' ').split(/\s/))
         resolve(result)
       .catch (data) ->
