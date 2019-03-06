@@ -387,8 +387,10 @@ class HttpServer extends Command
       listFN = (index) ->
         if index < liste.length
           item = liste[index]
-          filename = item.file.replace('.xml','.pdf')
-          prms = me.precheckfonts filename
+          fullfilename = item.file.replace('.xml','.pdf')
+          filename = path.basename(item.file).replace('.xml','.pdf')
+          dirname = path.dirname(item.file)
+          prms = me.precheckfonts fullfilename
           .then (data) ->
             liste[index].fontcheck = data
             result_liste.push liste[index]
@@ -397,6 +399,12 @@ class HttpServer extends Command
               resolve result_liste
           .catch (data) ->
             running[index]=0
+            if fs.existsSync(  path.join( dirname , filename ) )
+              fs.copyFileSync( path.resolve(  path.join( dirname , filename )  ),  path.join( me.args.errorpath , filename )  )
+              fs.unlinkSync( path.resolve(  path.join( dirname , filename )  ) )
+            if fs.existsSync(  path.join( dirname , filename.replace('.pdf','.xml') ) )
+              fs.copyFileSync( path.resolve(  path.join( dirname , filename.replace('.pdf','.xml') )  ),  path.join( me.args.errorpath , filename.replace('.pdf','.xml') )  )
+              fs.unlinkSync( path.resolve(  path.join( dirname , filename.replace('.pdf','.xml') )  ) )
             if running.reduce(me._sum, 0)==0
               resolve result_liste
             #reject data
