@@ -1,0 +1,7 @@
+
+#!/bin/bash
+
+# Seitenoffset einrichten
+BNAME=`basename $1`
+gs -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -dPDFFitPage -dFIXEDMEDIA -sOutputFile="$1.prn.pdf" -c "<</PageOffset [8 5]>> setpagedevice" -f $1
+lpr -J "$BNAME" -o sides=two-sided-long-edge -o Duplex=DuplexNoTumble -P color "$1.prn.pdf"

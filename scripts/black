@@ -1,0 +1,5 @@
+
+#!/bin/bash
+
+BNAME=`basename $1`
+lpr -J "$BNAME" -o sides=two-sided-long-edge -o Duplex=DuplexNoTumble -P vario "$1"

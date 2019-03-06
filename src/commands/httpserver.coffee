@@ -135,27 +135,23 @@ class HttpServer extends Command
           for file,index in files
             console.log 'print',file
             printerName='vario'
-            printerName='color'
+            scriptname=path.resolve(path.join(__dirname,'..','..','scripts','black'))
+            #printerName='color'
             if file.indexOf('color')>=0
               printerName='color'
+              scriptname=path.resolve(path.join(__dirname,'..','..','scripts','color'))
 
             cupsenable = me.runcommand 'cupsenable',[printerName]
             .then (data,opt) ->
+
               params = []
-              params.push '-J'+file
-              params.push '-o'
-              params.push 'sides=two-sided-long-edge'
-              params.push '-o'
-              params.push 'Duplex=DuplexNoTumble'
-              params.push '-P'
-              params.push printerName
               params.push path.join(me.tempdir,file)
 
               console.log 'print',params
 
               #me.archivFiles file
               fn = (index) ->
-                prms = me.runcommand 'lpr',params
+                prms = me.runcommand scriptname,params
                 .then (data,opt) ->
                   result.success= true
                   result.msg = "Gedruckt"
@@ -180,6 +176,47 @@ class HttpServer extends Command
                   if running.reduce(me._sum, 0)==0
                     res.send JSON.stringify(result)
               fn(index)
+              
+              if false
+                params = []
+                params.push '-J'+file
+                params.push '-o'
+                params.push 'sides=two-sided-long-edge'
+                params.push '-o'
+                params.push 'Duplex=DuplexNoTumble'
+                params.push '-P'
+                params.push printerName
+                params.push path.join(me.tempdir,file)
+
+                console.log 'print',params
+
+                #me.archivFiles file
+                fn = (index) ->
+                  prms = me.runcommand 'lpr',params
+                  .then (data,opt) ->
+                    result.success= true
+                    result.msg = "Gedruckt"
+                    result.data = data
+                    console.log 'print','done',running.reduce(me._sum, 0),index,data
+
+                    me.archivFiles file
+
+                    running[index-1]=0
+                    console.log 'print','done*',running,running.reduce(me._sum, 0),index,data
+
+                    if running.reduce(me._sum, 0)==0
+                      console.log 'print','done',running.reduce(me._sum, 0),index,data
+                      res.send JSON.stringify(result)
+
+                  .catch (data) ->
+                    console.log 'print',"Fehler beim Drucken ("+printerName+")",index,data
+                    result.success= false
+                    result.data = data
+                    running[index]=0
+                    result.msg = "Fehler beim Drucken ("+printerName+")"
+                    if running.reduce(me._sum, 0)==0
+                      res.send JSON.stringify(result)
+                fn(index)
 
             .catch (data) ->
               result.success = false
