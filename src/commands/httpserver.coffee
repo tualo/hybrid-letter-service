@@ -350,13 +350,16 @@ class HttpServer extends Command
     resul_liste = []
     return new Promise (resolve, reject) ->
       running = Array(liste.length).fill(1);
+      console.log "precheckfonts_loop"
       listFN = (index) ->
+        console.log "precheckfonts_loop", "running", running
         if index < liste.length
           item = liste[index]
           filename = path.basename(item.file).replace('.xml','.pdf')
           prms = me.precheckfonts filename
           .then (data) ->
             running[index]=0
+            console.log "precheckfonts_loop", "then", running
             if running.reduce(me._sum, 0)==0
               resolve liste
           .catch (data) ->
@@ -368,16 +371,17 @@ class HttpServer extends Command
 
   precheckfonts: (filename) ->
     #pdffonts
+    console.log('#','precheckfonts',filename)
     me = @
     new Promise (resolve, reject) ->
       params = []
       params.push path.join(filename)
-
       prms = me.runcommand 'pdffonts',params
       .then (data) ->
         console.log('#',data.replace(/\s(\s)+/,' ').split(/\s/))
         resolve(data)
       .catch (data) ->
+        console.log('# error',data)
         reject data
 
   printablePDFPages: (dirname, filename) ->
