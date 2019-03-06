@@ -769,31 +769,31 @@ class HttpServer extends Command
       try
         
         try
-          throw new Error(item.fname+' result ist nicht definiert') if typeof item.result == 'undefied'
-          throw new Error(item.fname+' JobTicket ist nicht definiert') if typeof item.result.JobTicket == 'undefied'
-          throw new Error(item.fname+' JobTicket[0] ist nicht definiert') if typeof item.result.JobTicket[0] == 'undefied'
+          throw new Error(item.fname+' result ist nicht definiert') if typeof item.result == 'undefined'
+          throw new Error(item.fname+' JobTicket ist nicht definiert') if typeof item.result.JobTicket == 'undefined'
+          throw new Error(item.fname+' JobTicket[0] ist nicht definiert') if typeof item.result.JobTicket[0] == 'undefined'
 
-          throw new Error(item.fname+' JobTicket.TicDP ist nicht definiert') if typeof item.result.JobTicket.TicDP == 'undefied'
-          throw new Error(item.fname+' JobTicket.TicDP[0] ist nicht definiert') if typeof item.result.JobTicket.TicDP[0] == 'undefied'
+          throw new Error(item.fname+' JobTicket.TicDP ist nicht definiert') if typeof item.result.JobTicket.TicDP == 'undefined'
+          throw new Error(item.fname+' JobTicket.TicDP[0] ist nicht definiert') if typeof item.result.JobTicket.TicDP[0] == 'undefined'
 
-          throw new Error(item.fname+' JobTicket.TicDP[0][TicDruckmodus] ist nicht definiert') if typeof item.result.JobTicket.TicDP[0]['TicDruckmodus'] == 'undefied'
-          throw new Error(item.fname+' JobTicket.TicDP[0][TicDruckmodus][0] ist nicht definiert') if typeof item.result.JobTicket.TicDP[0]['TicDruckmodus'][0] == 'undefied'
+          throw new Error(item.fname+' JobTicket.TicDP[0][TicDruckmodus] ist nicht definiert') if typeof item.result.JobTicket.TicDP[0]['TicDruckmodus'] == 'undefined'
+          throw new Error(item.fname+' JobTicket.TicDP[0][TicDruckmodus][0] ist nicht definiert') if typeof item.result.JobTicket.TicDP[0]['TicDruckmodus'][0] == 'undefined'
           
-          throw new Error(item.fname+' JobTicket.TicDP[0][TicDruckmodus][0][value] ist nicht definiert') if typeof item.result.JobTicket.TicDP[0]['TicDruckmodus'][0]['value'] == 'undefied'
-          throw new Error(item.fname+' JobTicket.TicDP[0][TicDruckmodus][0][value][0] ist nicht definiert') if typeof item.result.JobTicket.TicDP[0]['TicDruckmodus'][0]['value'][0] == 'undefied'
+          throw new Error(item.fname+' JobTicket.TicDP[0][TicDruckmodus][0][value] ist nicht definiert') if typeof item.result.JobTicket.TicDP[0]['TicDruckmodus'][0]['value'] == 'undefined'
+          throw new Error(item.fname+' JobTicket.TicDP[0][TicDruckmodus][0][value][0] ist nicht definiert') if typeof item.result.JobTicket.TicDP[0]['TicDruckmodus'][0]['value'][0] == 'undefined'
 
           
-          throw new Error(item.fname+' JobTicket.TicDP[0][TicKuvertgrösse] ist nicht definiert') if typeof item.result.JobTicket.TicDP[0]['TicKuvertgrösse'] == 'undefied'
-          throw new Error(item.fname+' JobTicket.TicDP[0][TicKuvertgrösse][0] ist nicht definiert') if typeof item.result.JobTicket.TicDP[0]['TicKuvertgrösse'][0] == 'undefied'
+          throw new Error(item.fname+' JobTicket.TicDP[0][TicKuvertgrösse] ist nicht definiert') if typeof item.result.JobTicket.TicDP[0]['TicKuvertgrösse'] == 'undefined'
+          throw new Error(item.fname+' JobTicket.TicDP[0][TicKuvertgrösse][0] ist nicht definiert') if typeof item.result.JobTicket.TicDP[0]['TicKuvertgrösse'][0] == 'undefined'
           
-          throw new Error(item.fname+' JobTicket.TicDP[0][TicKuvertgrösse][0][value] ist nicht definiert') if typeof item.result.JobTicket.TicDP[0]['TicKuvertgrösse'][0]['value'] == 'undefied'
-          throw new Error(item.fname+' JobTicket.TicDP[0][TicKuvertgrösse][0][value][0] ist nicht definiert') if typeof item.result.JobTicket.TicDP[0]['TicKuvertgrösse'][0]['value'][0] == 'undefied'
+          throw new Error(item.fname+' JobTicket.TicDP[0][TicKuvertgrösse][0][value] ist nicht definiert') if typeof item.result.JobTicket.TicDP[0]['TicKuvertgrösse'][0]['value'] == 'undefined'
+          throw new Error(item.fname+' JobTicket.TicDP[0][TicKuvertgrösse][0][value][0] ist nicht definiert') if typeof item.result.JobTicket.TicDP[0]['TicKuvertgrösse'][0]['value'][0] == 'undefined'
           
-          throw new Error(item.fname+' JobTicket.TicDP[0][TicLayout] ist nicht definiert') if typeof item.result.JobTicket.TicDP[0]['TicLayout'] == 'undefied'
-          throw new Error(item.fname+' JobTicket.TicDP[0][TicLayout][0] ist nicht definiert') if typeof item.result.JobTicket.TicDP[0]['TicLayout'][0] == 'undefied'
+          throw new Error(item.fname+' JobTicket.TicDP[0][TicLayout] ist nicht definiert') if typeof item.result.JobTicket.TicDP[0]['TicLayout'] == 'undefined'
+          throw new Error(item.fname+' JobTicket.TicDP[0][TicLayout][0] ist nicht definiert') if typeof item.result.JobTicket.TicDP[0]['TicLayout'][0] == 'undefined'
           
-          throw new Error(item.fname+' JobTicket.TicDP[0][TicLayout][0][value] ist nicht definiert') if typeof item.result.JobTicket.TicDP[0]['TicLayout'][0]['value'] == 'undefied'
-          throw new Error(item.fname+' JobTicket.TicDP[0][TicLayout][0][value][0] ist nicht definiert') if typeof item.result.JobTicket.TicDP[0]['TicLayout'][0]['value'][0] == 'undefied'
+          throw new Error(item.fname+' JobTicket.TicDP[0][TicLayout][0][value] ist nicht definiert') if typeof item.result.JobTicket.TicDP[0]['TicLayout'][0]['value'] == 'undefined'
+          throw new Error(item.fname+' JobTicket.TicDP[0][TicLayout][0][value][0] ist nicht definiert') if typeof item.result.JobTicket.TicDP[0]['TicLayout'][0]['value'][0] == 'undefined'
           id = item.result.JobTicket.Job_ID[0]
           #console.log 'xml2store','id',id,JSON.stringify(item.result.JobTicket.TicDP,null,1)
           customer = item.result.JobTicket.Customer[0]
