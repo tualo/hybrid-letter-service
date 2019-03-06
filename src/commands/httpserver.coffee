@@ -394,11 +394,11 @@ class HttpServer extends Command
             result_liste.push liste[index]
             running[index]=0
             if running.reduce(me._sum, 0)==0
-              resolve liste
+              resolve result_liste
           .catch (data) ->
             running[index]=0
             if running.reduce(me._sum, 0)==0
-              resolve liste
+              resolve result_liste
             #reject data
           listFN index+1
         else
