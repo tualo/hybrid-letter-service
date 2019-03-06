@@ -381,7 +381,7 @@ class HttpServer extends Command
         result = 
           success: true
           msg: ''
-          filename: filename
+          filename: path.basename(filename)
           fonts: []
         fonts_tab = data.split(/\n/)
         hasError = false

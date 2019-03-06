@@ -55,6 +55,18 @@ Ext.define('HybridLetterServer.view.Portal', {
             
             columns: [
 
+                {text: 'Schriften',  dataIndex:'fontcheck', renderer: function(v){
+                    try{
+                        if (v.success){
+                            return "OK"
+                        }else{
+                            return v.message
+                        }
+                    }catch(e){
+
+                    }
+                    return 'Fehler'
+                }},
                 {text: 'Kunde',  dataIndex:'customer'},
                 {text: 'Seiten',  dataIndex:'pages'},
                 {text: 'Umschlag',  dataIndex:'envelope'},
