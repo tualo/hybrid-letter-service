@@ -22,8 +22,8 @@ colorprinter=''
 module.exports =
 class HttpServer extends Command
   @commandName: 'httpserver'
-  @commandArgs: ['port','jobpath','archivpath']
-  @commandShortDescription: 'running the bbs machine controll service'
+  @commandArgs: ['port','jobpath','archivpath','errorpath']
+  @commandShortDescription: 'running the hybrid letter service'
   @options: []
 
   @help: () ->
@@ -86,7 +86,14 @@ class HttpServer extends Command
           .then (result_liste) ->
             console.log '/hls/hybrid/list'
             result.data=result_liste
-            res.send JSON.stringify(result)
+            promise3 = me.processJobFiles2SinglePages(result_liste)
+            .then (data) ->
+              result.data=result_liste
+              res.send JSON.stringify(result)
+            .catch (data) ->
+              result.success= false
+              result.msg = "Fehler beim Vorbereiten der Aufträge *"
+              res.send JSON.stringify(result)
           .catch (data) ->
             result.success=false
             result.data_fonts=data
@@ -311,11 +318,11 @@ class HttpServer extends Command
           outputText+=data.toString() + "\n"
           
         prg.stderr.on 'data', (data) ->
-          if data.toString().indexOf('ERROR: A pdfmark destination page')>0
-            errorText+=data.toString()+"\n"
-          else
-            errorText+=data.toString()+"\n"
-            hasError = true
+          #if data.toString().indexOf('ERROR: A pdfmark destination page')>0
+          #  errorText+=data.toString()+"\n"
+          #else
+          errorText+=data.toString()+"\n"
+          hasError = true
 
         prg.on 'close', (code) ->
           if hasError
@@ -337,6 +344,7 @@ class HttpServer extends Command
   
   processJobFiles2SinglePages: (liste) ->
     me = @
+    result_liste = []
     return new Promise (resolve, reject) ->
       running = Array(liste.length).fill(1);
       listFN = (index) ->
@@ -346,15 +354,28 @@ class HttpServer extends Command
           dirname = path.dirname(item.file)
           prms = me.printablePDFPages dirname,filename
           .then (data) ->
+            result_liste.push item
             running[index]=0
             if running.reduce(me._sum, 0)==0
               resolve liste
           .catch (data) ->
-            console.log "processJobFiles2SinglePages", filename
-            console.log "processJobFiles2SinglePages", data
-            reject data
+            running[index]=0
+            ## move error files
+            if fs.existsSync(  path.join( dirname , filename ) )
+              fs.copyFileSync( path.resolve(  path.join( dirname , filename )  ),  path.join( me.args.errorpath , filename )  )
+              fs.unlinkSync( path.resolve(  path.join( dirname , filename )  ) )
+            if fs.existsSync(  path.join( dirname , filename.replace('.pdf','.xml') ) )
+              fs.copyFileSync( path.resolve(  path.join( dirname , filename.replace('.pdf','.xml') )  ),  path.join( me.args.errorpath , filename.replace('.pdf','.xml') )  )
+              fs.unlinkSync( path.resolve(  path.join( dirname , filename.replace('.pdf','.xml') )  ) )
+
+            if running.reduce(me._sum, 0)==0
+              resolve liste
+            #console.log "processJobFiles2SinglePages", filename
+            #console.log "processJobFiles2SinglePages", data
+            #reject data
           listFN index+1
         else
+          reject data
           
       listFN 0
 
