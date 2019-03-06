@@ -771,7 +771,6 @@ class HttpServer extends Command
         try
           throw new Error(item.fname+' result ist nicht definiert') if typeof item.result == 'undefined'
           throw new Error(item.fname+' JobTicket ist nicht definiert') if typeof item.result.JobTicket == 'undefined'
-          throw new Error(item.fname+' JobTicket[0] ist nicht definiert') if typeof item.result.JobTicket[0] == 'undefined'
 
           throw new Error(item.fname+' JobTicket.TicDP ist nicht definiert') if typeof item.result.JobTicket.TicDP == 'undefined'
           throw new Error(item.fname+' JobTicket.TicDP[0] ist nicht definiert') if typeof item.result.JobTicket.TicDP[0] == 'undefined'
