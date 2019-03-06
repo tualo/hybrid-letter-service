@@ -383,6 +383,9 @@ class HttpServer extends Command
       prms = me.runcommand 'pdffonts',params
       .then (data) ->
         console.log('#',data.replace(/\s(\s)+/,' ').split(/\s/))
+        let fonts_tab = data.split(/\n/)
+        fonts_tab.forEach (line) ->
+          console.log('#',line,line.replace(/\s(\s)+/,' ').split(/\s/))
         resolve(data)
       .catch (data) ->
         console.log('# error',data)
