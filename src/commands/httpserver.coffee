@@ -93,6 +93,7 @@ class HttpServer extends Command
             .catch (data) ->
               result.success= false
               result.msg = "Fehler beim Vorbereiten der Aufträge *"
+              console.log 'Fehler beim Vorbereiten der Aufträge', data
               res.send JSON.stringify(result)
           .catch (data) ->
             result.success=false
@@ -375,7 +376,6 @@ class HttpServer extends Command
             #reject data
           listFN index+1
         else
-          reject data
           
       listFN 0
 
