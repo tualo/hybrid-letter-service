@@ -83,9 +83,9 @@ class HttpServer extends Command
         console.log '/hls/hybrid/list',data.length
 
         prms_font = me.precheckfonts_loop(data)
-        .then (data) ->
+        .then (result_liste) ->
           console.log '/hls/hybrid/list'
-          result.data_fonts=data
+          result.data=result_liste
           res.send JSON.stringify(result)
         .catch (data) ->
           result.success=false
@@ -350,7 +350,7 @@ class HttpServer extends Command
 
   precheckfonts_loop: (liste)->
     me = @
-    resul_liste = []
+    result_liste = []
     return new Promise (resolve, reject) ->
       running = Array(liste.length).fill(1);
       listFN = (index) ->
@@ -359,10 +359,10 @@ class HttpServer extends Command
           filename = item.file.replace('.xml','.pdf')
           prms = me.precheckfonts filename
           .then (data) ->
-            liste.fontcheck = data
+            liste[index].fontcheck = data
             running[index]=0
             if running.reduce(me._sum, 0)==0
-              resolve liste
+              resolve result_liste
           .catch (data) ->
             reject data
           listFN index+1
