@@ -80,8 +80,13 @@ class HttpServer extends Command
       prms = @globJobFiles()
       .then (data) ->
         result.data=data
-
-        res.send JSON.stringify(result)
+        prms_font = me.precheckfonts_loop()
+        .then (data) ->
+          
+          res.send JSON.stringify(result)
+        .catch (data) ->
+          result.success=false
+          res.send JSON.stringify(result)
       .catch (data) ->
         result.success= false
         result.msg = "Fehler beim Lesen der Aufträge"
@@ -339,6 +344,40 @@ class HttpServer extends Command
           
       listFN 0
 
+  precheckfonts_loop: (liste)->
+    me = @
+    resul_liste = []
+    return new Promise (resolve, reject) ->
+      running = Array(liste.length).fill(1);
+      listFN = (index) ->
+        if index < liste.length
+          item = liste[index]
+          filename = path.basename(item.file).replace('.xml','.pdf')
+          prms = me.precheckfonts filename
+          .then (data) ->
+            running[index]=0
+            if running.reduce(me._sum, 0)==0
+              resolve liste
+          .catch (data) ->
+            console.log "precheckfonts_loop", filename
+            reject data
+          listFN index+1
+        else
+      listFN 0
+
+  precheckfonts: (filename) ->
+    #pdffonts
+    me = @
+    new Promise (resolve, reject) ->
+      params = []
+      params.push path.join(filename)
+
+      prms = me.runcommand 'pdffonts',params
+      .then (data) ->
+        console.log('#',data.replace(/\s(\s)+/,' ').split(/\s/))
+        resolve(data)
+      .catch (data) ->
+        reject data
 
   printablePDFPages: (dirname, filename) ->
     me = @
