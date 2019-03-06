@@ -311,8 +311,11 @@ class HttpServer extends Command
           outputText+=data.toString() + "\n"
           
         prg.stderr.on 'data', (data) ->
-          errorText+=data.toString()+"\n"
-          hasError = true
+          if data.toString().indexOf('ERROR: A pdfmark destination page')>0
+            errorText+=data.toString()+"\n"
+          else
+            errorText+=data.toString()+"\n"
+            hasError = true
 
         prg.on 'close', (code) ->
           if hasError
