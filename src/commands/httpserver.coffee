@@ -414,6 +414,7 @@ class HttpServer extends Command
       params = []
       params.push '-q'
       params.push '-dNOPAUSE'
+      params.push '-dDOPDFMARKS=false'
       params.push '-dBATCH'
       params.push '-sDEVICE=pdfwrite'
       params.push '-r600'
@@ -439,6 +440,7 @@ class HttpServer extends Command
         params2.push '-q'
         params2.push '-dNOPAUSE'
         params2.push '-dBATCH'
+        params2.push '-dDOPDFMARKS=false'
         params2.push '-sDEVICE=jpeg'
         params2.push '-r72'
         params2.push '-sOutputFile='+path.join(me.tempdir,filename)+'%05d.jpg'
