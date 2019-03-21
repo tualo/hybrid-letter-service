@@ -315,6 +315,9 @@ class HttpServer extends Command
         hasError = false
         errorText = "";
         outputText = "";
+        prg.on 'error', (error) ->
+          console.error "ERROR error",error
+          reject error,opt
         prg.stdout.on 'data', (data) ->
           outputText+=data.toString() + "\n"
           
@@ -327,7 +330,7 @@ class HttpServer extends Command
 
         prg.on 'close', (code) ->
           if hasError
-            console.error "ERROR",errorText
+            console.error "ERROR ---",errorText
             reject errorText,opt
           else
             resolve outputText,opt
@@ -363,6 +366,7 @@ class HttpServer extends Command
             running[index]=0
             ## move error files
             if fs.existsSync(  path.join( dirname , filename ) )
+              fs.writeFileSync(path.join( me.args.errorpath , filename+'.error.txt' ),JSON.stringify(data,null,1))
               fs.copyFileSync( path.resolve(  path.join( dirname , filename )  ),  path.join( me.args.errorpath , filename )  )
               fs.unlinkSync( path.resolve(  path.join( dirname , filename )  ) )
             if fs.existsSync(  path.join( dirname , filename.replace('.pdf','.xml') ) )
@@ -400,6 +404,7 @@ class HttpServer extends Command
           .catch (data) ->
             running[index]=0
             if fs.existsSync(  path.join( dirname , filename ) )
+              fs.writeFileSync(path.join( me.args.errorpath , filename+'.error.txt' ),JSON.stringify(data,null,1))
               fs.copyFileSync( path.resolve(  path.join( dirname , filename )  ),  path.join( me.args.errorpath , filename )  )
               fs.unlinkSync( path.resolve(  path.join( dirname , filename )  ) )
             if fs.existsSync(  path.join( dirname , filename.replace('.pdf','.xml') ) )
@@ -419,6 +424,7 @@ class HttpServer extends Command
     new Promise (resolve, reject) ->
       params = []
       params.push path.join(filename)
+      console.log('pdffonts','--->')
       prms = me.runcommand 'pdffonts',params
       .then (data) ->
         result = 
