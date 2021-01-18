@@ -584,7 +584,7 @@ class HttpServer extends Command
     for item in list
       console.log item.pages,item.lastpage,item.pagenum,item.sequence,item.layout,path.basename(item.highrespdf)
       if item.layout=="Doppelseitig"
-        if item.pages*1==item.pagenum
+        if (item.pages*1==item.pagenum && path.basename(item.highrespdf)=="blank.pdf") || (item.pages*1==item.pagenum+1 && path.basename(item.highrespdf)!="blank.pdf")
           list[loopindex+1].lastpage=true
       else
         if item.pages*1==item.pagenum
