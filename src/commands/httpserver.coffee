@@ -74,17 +74,17 @@ class HttpServer extends Command
     app.get '/hls/hybrid/list', (req, res) =>
       me = @
       result = {success: true}
-      console.log '/hls/hybrid/list'
+      # console.log '/hls/hybrid/list'
       me.filter = null
 
       prms = @globJobFiles()
       .then (data) ->
         result.data=data
-        console.log '/hls/hybrid/list',data.length
+        # console.log '/hls/hybrid/list',data.length
         if data.length > 0
           prms_font = me.precheckfonts_loop(data)
           .then (result_liste) ->
-            console.log '/hls/hybrid/list'
+            # console.log '/hls/hybrid/list'
             result.data=result_liste
             promise3 = me.processJobFiles2SinglePages(result_liste)
             .then (data) ->
@@ -419,12 +419,12 @@ class HttpServer extends Command
 
   precheckfonts: (filename) ->
     #pdffonts
-    console.log('#','precheckfonts',filename)
+    #console.log('#','precheckfonts',filename)
     me = @
     new Promise (resolve, reject) ->
       params = []
       params.push path.join(filename)
-      console.log('pdffonts','--->')
+      #console.log('pdffonts','--->')
       prms = me.runcommand 'pdffonts',params
       .then (data) ->
         result = 
@@ -475,7 +475,7 @@ class HttpServer extends Command
       #params.push '-dAutoRotatePages=/PageByPage'
       params.push path.join(dirname,filename)
 
-      console.log  'gs ',params.join(' '),path.join(dirname,filename)
+      #console.log  'gs ',params.join(' '),path.join(dirname,filename)
       prms = me.runcommand 'gs',params
       .then (data) ->
         
@@ -548,13 +548,13 @@ class HttpServer extends Command
           sequence+=1
           
 
-      if sequence!=0
-        if list[sequence-1]
-          list[sequence-1].lastpage=true
+      #if sequence!=0
+      #  if list[sequence-1]
+      #    list[sequence-1].lastpage=true
 
-          if list[sequence-1].pagenum%2==1
+          #if list[sequence-1].pagenum%2==1
             # frontseite zur letzten erklären
-            list[sequence-2].lastpage=true
+          #  list[sequence-2].lastpage=true
       
 
 
@@ -578,15 +578,30 @@ class HttpServer extends Command
 
     sequenceNum=0
 
-    console.log list
+    list = list.reverse()
+    console.log "*pages","lastpage","pagenum","sequence","layout","highrespdf"
+    loopindex=0
+    for item in list
+      console.log item.pages,item.lastpage,item.pagenum,item.sequence,item.layout,path.basename(item.highrespdf)
+      if item.layout=="Doppelseitig"
+        if item.pages*1==item.pagenum
+          list[loopindex+1].lastpage=true
+      else
+        if item.pages*1==item.pagenum
+          item.lastpage=true
+      loopindex++
+    list = list.reverse()
+
+    #console.log list
+    console.log "pages","lastpage","pagenum","sequence","layout","highrespdf"
     for item in list
       if typeof me.sequencesStore[item.color+'|'+item.envelope]=='undefined'
         me.sequencesStore[item.color+'|'+item.envelope]=0
       sequenceNum=me.sequencesStore[item.color+'|'+item.envelope]
-
+      console.log item.pages,item.lastpage,item.pagenum,item.sequence,item.layout,path.basename(item.highrespdf)
       if item.pagenum%2 == 0
         seq = Number(sequenceNum).toString(2).substr(-3)#;//.split("").reverse().join("")
-        console.log item.highrespdf, sequenceNum, seq
+        # console.log item.highrespdf, sequenceNum, seq
         sequenceNum+=1
         while seq.length < 3
           seq='0'+seq
@@ -601,7 +616,7 @@ class HttpServer extends Command
         else
           seq = seq.replace('p','0')
         item.omr=seq
-        console.log item.highrespdf,'>>>>>', seq
+        # console.log item.highrespdf,'>>>>>', seq
       me.sequencesStore[item.color+'|'+item.envelope]=sequenceNum
 
     me.storeSequences()
@@ -765,7 +780,7 @@ class HttpServer extends Command
 
             filelist.push(record)
 
-        console.log "\n\n\n\n"+params.join(" \\\n")+"\n\n\n\n"
+        # console.log "\n\n\n\n"+params.join(" \\\n")+"\n\n\n\n"
 
         prms = me.runcommand 'gs',params
         .then (data) ->
@@ -785,6 +800,8 @@ class HttpServer extends Command
     new Promise (resolve, reject) =>
       pathname = me.args.jobpath
       liste = glob.sync path.join(pathname,'*.xml')
+      liste = liste.slice(0, 100)
+
       @loopxml [],liste,0,(res) ->
         res.forEach (item) ->
           item.shortname = path.basename(item.file)
@@ -811,6 +828,7 @@ class HttpServer extends Command
   
   xml2store: (liste,cb) ->
     result = []
+    # console.log('xml2store',liste.length )
     liste.forEach (item) ->
       try
         
@@ -857,7 +875,7 @@ class HttpServer extends Command
 
 
         o =
-          id: id
+          id: id+item.fname
           group: envelope+' / '+color
           customer: customer
           file: item.fname
@@ -869,6 +887,7 @@ class HttpServer extends Command
         result.push o
       catch e
         console.log e
+    # console.log('xml2store', result  )
     cb result
   # END files store data
 
@@ -900,7 +919,7 @@ class HttpServer extends Command
     me = @
     if fs.existsSync(path.join(me.tempdir,file+'.json'))
       files = JSON.parse(fs.readFileSync(path.join(me.tempdir,file+'.json')))
-      console.log 'archivFiles',files
+      # console.log 'archivFiles',files
       files.forEach (fileitem) ->
         if typeof fileitem.shortname=='string'
           
