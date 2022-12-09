@@ -21,7 +21,7 @@
   },
   "homepage": "https://github.com/tualo/hybrid-letter-service#readme",
   "dependencies": {
-    "express": "^4.16.4",
+    "express": "^4.17.3",
     "mkdirp": "^0.5.1",
     "pdfkit": "^0.8.3",
     "tualo-commander": "^1.0.0"
